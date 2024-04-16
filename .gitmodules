@@ -1,0 +1,3 @@
+[submodule "MultiAgentDRL-RCRS"]
+	path = MultiAgentDRL-RCRS
+	url = https://github.com/animeshgoyal9/MultiAgentDRL-RCRS.git
