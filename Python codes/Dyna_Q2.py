@@ -126,7 +126,7 @@ if __name__ == "__main__":
     steps_episode = agent.steps_per_episode
     cumulative_r = agent.cumulative_reward_per_episode
 
-    with open('training_test4.txt', 'w+') as f:
+    with open('training_test5.txt', 'w+') as f:
         f.write(str(agent.Q_values))
 
     noEpoches = agent.max_epochs
