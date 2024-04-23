@@ -1,0 +1,11 @@
+Metadata-Version: 2.1
+Name: gym_pathfinding
+Version: 0.0.1
+Summary: Gym environnement for pathfinding
+Home-page: https://github.com/DidiBear/gym-pathfinding
+Author: Adrien Turiot
+Requires-Dist: gym==0.9.7
+Requires-Dist: cython
+Requires-Dist: numpy
+Requires-Dist: scipy
+Requires-Dist: pygame
