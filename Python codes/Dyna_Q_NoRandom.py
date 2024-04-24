@@ -8,7 +8,7 @@ from time import sleep
 class DynaAgent:
 
     def __init__(self, exp_rate=0.7, lr=0.9, gamma = 0.9, max_epochs = 500, n_steps=5, episodes=1):
-        self.env = gym.make('pathfinding-obstacle-25x25-v0')
+        self.env = gym.make('pathfinding-free-9x9-v0')
         self.state = self.env.getPlayer() # (x,y)
         self.actions = [0,1,2,3] # 0 up, 1 down, 2 left, 3 right
         self.state_actions = [] # state & action track
@@ -52,19 +52,10 @@ class DynaAgent:
                         action = a
                         mx_nxt_reward = nxt_reward
         return action
-    
-    def randomStart(self):
-        # To start from a rondom position
-        while True:    
-            x = np.random.randint(0,self.env.getLines())
-            y = np.random.randint(0,self.env.getColumns())
-            if(self.env.game.grid[x,y] == 0):
-                return (x,y)
 
     def reset(self):
         self.env.reset()
         self.env.seed(1)
-        # self.env.game.player = self.randomStart() # uses randomStart
         self.state = self.env.getPlayer()
         self.state_actions = []
 
@@ -144,7 +135,7 @@ if __name__ == "__main__":
     cumulative_r_100 = agent.cumulative_reward_per_episode
 
     # Save the Q-table in a text file
-    with open(r'training_testDQB.txt','w+') as f:
+    with open(r'training_test.txt','w+') as f:
         f.write(str(agent.Q_values))
 
     noEpoches = agent.max_epochs
@@ -172,4 +163,3 @@ if __name__ == "__main__":
     print(f"Convergence speed After {conv} episodes")
     
     plt.show()
-    
