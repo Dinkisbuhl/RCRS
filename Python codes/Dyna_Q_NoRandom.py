@@ -8,7 +8,7 @@ from time import sleep
 class DynaAgent:
 
     def __init__(self, exp_rate=0.7, lr=0.9, gamma = 0.9, max_epochs = 500, n_steps=5, episodes=1):
-        self.env = gym.make('pathfinding-free-9x9-v0')
+        self.env = gym.make('pathfinding-obstacle-25x25-v0')
         self.state = self.env.getPlayer() # (x,y)
         self.actions = [0,1,2,3] # 0 up, 1 down, 2 left, 3 right
         self.state_actions = [] # state & action track
