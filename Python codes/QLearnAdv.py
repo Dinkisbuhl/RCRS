@@ -9,37 +9,38 @@ class DynaAgent:
 
     def __init__(self, exp_rate=0.7, lr=0.9, gamma=0.9, max_epochs=500, n_steps=5, episodes=1):
         self.env = gym.make('pathfinding-obstacle-25x25-v0')
-        self.state = self.env.getPlayer()  # (x,y)
-        self.actions = [0, 1, 2, 3]  # 0 up, 1 down, 2 left, 3 right
-        self.state_actions = []  # state & action track
-        self.exp_rate = exp_rate  # Epsilon
-        self.lr = lr  # learning rate
+        self.state = self.env.getPlayer()
+        self.actions = [0, 1, 2, 3]
+        self.state_actions = []
+        self.exp_rate = exp_rate
+        self.lr = lr
         self.gamma = gamma
-        self.max_epochs = max_epochs  # maximum trials each episode
+        self.max_epochs = max_epochs
         self.success_episodes = 0
         self.convergence_episode = 0
-        self.steps = n_steps  # Planning steps
-        self.episodes = episodes  # number of episodes going to play
+        self.steps = n_steps
+        self.episodes = episodes
         self.steps_per_episode = []
         self.cumulative_reward_per_episode = []
 
         self.Q1_values = {}
         self.Q2_values = {}
-        # model function
-        self.model = {}
+        self.model = {}  # Environment model: {state: {action: (reward, next_state)}}
+        # Initialize Q-values for all state-action pairs
         for row in range(self.env.getLines()):
             for col in range(self.env.getColumns()):
                 self.Q1_values[(row, col)] = {a: 0 for a in self.actions}
                 self.Q2_values[(row, col)] = {a: 0 for a in self.actions}
 
     def chooseAction(self):
-        # epsilon-greedy
+        # Epsilon-greedy action selection
         if np.random.uniform(0, 1) <= self.exp_rate:
             return np.random.choice(self.actions)
         else:
             return np.argmax([self.Q1_values[self.state][a] + self.Q2_values[self.state][a] for a in self.actions])
 
     def reset(self):
+        # Reset environment and agent state
         self.env.reset()
         self.env.seed(1)
         self.state = self.env.getPlayer()
@@ -48,8 +49,8 @@ class DynaAgent:
     def play(self):
         self.steps_per_episode = []
         self.cumulative_reward_per_episode = []
-        self.reset()
         for ep in range(self.episodes):
+            self.reset()
             epoches = 0
             cumulative_reward = 0
             while epoches < self.max_epochs:
@@ -63,7 +64,7 @@ class DynaAgent:
 
                 cumulative_reward += reward
 
-                # Update Q-values
+                # Update Q-values using Q-learning with Double Q-learning
                 if np.random.uniform(0, 1) < 0.5:
                     max_next = np.max(list(self.Q1_values[nxtState].values()))
                     self.Q1_values[self.state][action] += self.lr * (
@@ -73,13 +74,13 @@ class DynaAgent:
                     self.Q2_values[self.state][action] += self.lr * (
                             reward + self.gamma * max_next - self.Q2_values[self.state][action])
 
-                # Update model
+                # Update environment model
                 if self.state not in self.model:
                     self.model[self.state] = {}
                 self.model[self.state][action] = (reward, nxtState)
                 self.state = nxtState
 
-                # Loop n times to randomly update Q-values
+                # Perform n planning steps using model
                 for _ in range(self.steps):
                     rand_idx = np.random.choice(range(len(self.model.keys())))
                     _state = list(self.model)[rand_idx]
@@ -107,7 +108,7 @@ class DynaAgent:
                     self.success_episodes += 1
                     break
 
-            # End of game
+            # Decrease exploration rate over episodes
             if self.exp_rate > 0.01:
                 self.exp_rate *= 0.95
             if ep % 100 == 0:
@@ -126,7 +127,7 @@ if __name__ == "__main__":
     steps_episode_100 = agent.steps_per_episode
     cumulative_r_100 = agent.cumulative_reward_per_episode
 
-    # Save the Q-table in a text file
+    # Save the Q-values in a text file
     with open(r'training_test3.txt', 'w+') as f:
         f.write(str(agent.Q1_values))
         f.write('\n')
