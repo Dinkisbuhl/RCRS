@@ -1,0 +1,9 @@
+gym==0.9.7
+keras==2.14.0
+matplotlib==3.8.4
+numpy==1.26.4
+pygame==2.5.2
+pytest==8.2.0
+scipy==1.13.0
+setuptools==59.6.0
+tensorflow==2.14.0
