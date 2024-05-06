@@ -12,20 +12,22 @@ import gym_pathfinding
 import matplotlib.pyplot as plt
 from time import sleep
 
+# Number of episodes to train
 EPISODES = 200
 
 class DQNAgent:
 
     def __init__(self, state_size, action_size):
+        # Initial max memory and other hyper parameters
         self.state_size = state_size
         self.action_size = action_size
         self.memory = list()
-        self.max_mem = 1000
-        self.gamma = 0.95   # discount rate
-        self.epsilon = 0.9 # exploration rate
+        self.max_mem = 1000 # max memory decreased to protect against old bad learnt routes
+        self.gamma = 0.95   # discount rate lowered slightly to improve perf in 11x11 scenarios
+        self.epsilon = 0.9 # exploration rate reduced for same reason
         self.epsilon_min = 0.01
         self.epsilon_decay = 0.98
-        self.learning_rate = 0.003
+        self.learning_rate = 0.003 # learning rate increased 
         self.replay_cnt = 0 
         self.actions = [0,1,2,3]
 
@@ -34,29 +36,23 @@ class DQNAgent:
         self.update_model = 10
 
     def _build_model(self):
-
-        # Neural Net for Deep-Q learning Model
-        # model = Sequential()
-        # model.add(Dense(32, input_dim=self.state_size, activation='relu'))  # Increased neurons
-        # model.add(Dropout(0.2))  # Dropout layer to reduce overfitting
-        # model.add(Dense(64, activation='relu'))  # Additional hidden layer
-        # model.add(Dense(self.action_size, activation='linear'))
-        # model.compile(loss='mse',
-        #               optimizer=Adam(lr=self.learning_rate))  # Reduced learning rate
+        # NN to approximate Q function
         model = Sequential()
-        model.add(Dense(24, input_dim=self.state_size, activation='tanh'))
-        model.add(Dense(24, activation='tanh'))
+        model.add(Dense(24, input_dim=self.state_size, activation='relu')) # less dense network with rectified linear activation function
+        model.add(Dense(24, activation='relu'))
         model.add(Dense(self.action_size, activation='linear'))
         model.compile(loss='mse',
                       optimizer=Adam(lr=self.learning_rate))
         return model
 
     def remember(self, state, action, reward, next_state, done):
+        # Store experience learnt
         self.memory.append((state, action, reward, next_state, done))
         if(len(self.memory)>self.max_mem) :
             self.memory.pop(0)
 
     def act(self, state):
+        # pick one action, up, down, left or right
         if np.random.uniform(0,1) <= self.epsilon:
             return random.choice(range(self.action_size) )
         act_values = self.model.predict(state)[0]
@@ -65,7 +61,7 @@ class DQNAgent:
 
     def replay(self, batch_size):
         self.replay_cnt+=1 
-
+        # Train model using random sampled experience from replay buffer
         minibatch = random.sample(self.memory, batch_size)
         for state, action, reward, next_state, done in minibatch:
             target = reward # q value of the state  if it is the final 
@@ -100,7 +96,6 @@ class DQNAgent:
         self.state = self.env.getPlayer()
         self.state_actions = []
 
-    # def play(self):
 
 
 if __name__ == "__main__":
@@ -128,8 +123,6 @@ if __name__ == "__main__":
         state = env.reset()
 
         env.seed(1)
-        # state = [[0]*state_size]*1
-        # state[0][env.getPlayer()[0]*25 + env.getPlayer()[1]] = 1
 
         state = np.zeros((1, state_size))
         player_pos = env.getPlayer()
@@ -156,6 +149,7 @@ if __name__ == "__main__":
                 reward += abs(reward * 0.05)
             reward_sum += reward
             
+               # below, useful if running into memory limits and debugging
                # print("memory length", len(agent.memory))
             agent.remember(state, action, reward, next_state, done)
             state = next_state
@@ -171,6 +165,7 @@ if __name__ == "__main__":
                 agent.replay(batch_size)
         #if e % 1000 == 0:
         #     agent.save("./save/dqn" + str(e) + ".h5")
+        # above, option to write to disk periodically
         steps_per_episode.append(steps)
         cumulative_reward_per_episode.append(reward_sum)
     
