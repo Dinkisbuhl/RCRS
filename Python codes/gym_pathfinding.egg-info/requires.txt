@@ -1,5 +1,5 @@
-gym==0.9.7
 cython
+gym==0.9.7
 numpy
-scipy
 pygame
+scipy

@@ -1,9 +1,11 @@
+import math
 import random
 import numpy as np
 from collections import deque
 from keras.models import Sequential
 from keras.layers import Dense, TimeDistributed
 from keras.layers import SimpleRNN
+from keras.layers import Dropout
 from keras.optimizers import Adam
 import gym
 import gym_pathfinding
@@ -18,12 +20,12 @@ class DQNAgent:
         self.state_size = state_size
         self.action_size = action_size
         self.memory = list()
-        self.max_mem = 5000
-        self.gamma = 0.98   # discount rate
-        self.epsilon = 1.0  # exploration rate
-        self.epsilon_min = 0.001
-        self.epsilon_decay = 0.998
-        self.learning_rate = 0.001
+        self.max_mem = 1000
+        self.gamma = 0.95   # discount rate
+        self.epsilon = 0.9 # exploration rate
+        self.epsilon_min = 0.01
+        self.epsilon_decay = 0.98
+        self.learning_rate = 0.003
         self.replay_cnt = 0 
         self.actions = [0,1,2,3]
 
@@ -34,9 +36,16 @@ class DQNAgent:
     def _build_model(self):
 
         # Neural Net for Deep-Q learning Model
+        # model = Sequential()
+        # model.add(Dense(32, input_dim=self.state_size, activation='relu'))  # Increased neurons
+        # model.add(Dropout(0.2))  # Dropout layer to reduce overfitting
+        # model.add(Dense(64, activation='relu'))  # Additional hidden layer
+        # model.add(Dense(self.action_size, activation='linear'))
+        # model.compile(loss='mse',
+        #               optimizer=Adam(lr=self.learning_rate))  # Reduced learning rate
         model = Sequential()
-        model.add(Dense(625, input_dim=self.state_size, activation='tanh'))
-        model.add(Dense(32, activation='tanh'))
+        model.add(Dense(24, input_dim=self.state_size, activation='tanh'))
+        model.add(Dense(24, activation='tanh'))
         model.add(Dense(self.action_size, activation='linear'))
         model.compile(loss='mse',
                       optimizer=Adam(lr=self.learning_rate))
@@ -95,7 +104,7 @@ class DQNAgent:
 
 
 if __name__ == "__main__":
-    env = gym.make('pathfinding-free-9x9-v0')
+    env = gym.make('pathfinding-obstacle-11x11-v0')
     steps_per_episode = []
     cumulative_reward_per_episode = []
     env.reset()
@@ -108,7 +117,7 @@ if __name__ == "__main__":
     agent = DQNAgent(state_size, action_size)
 
     done = False
-    batch_size = 48
+    batch_size = 64
 
     print("START DQN")
     donecount=0 
@@ -132,7 +141,7 @@ if __name__ == "__main__":
         while steps < 300:
 
             env.render()
-            sleep(0.003)
+            sleep(0.001)
 
             action = agent.act(state)
 
@@ -144,6 +153,7 @@ if __name__ == "__main__":
             next_state = np.reshape(next_state, [1, state_size])
             if(done == True):
                 donecount+=1
+                reward += abs(reward * 0.05)
             reward_sum += reward
             
                # print("memory length", len(agent.memory))
