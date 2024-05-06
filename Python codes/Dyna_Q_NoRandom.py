@@ -52,19 +52,10 @@ class DynaAgent:
                         action = a
                         mx_nxt_reward = nxt_reward
         return action
-    
-    def randomStart(self):
-        # To start from a rondom position
-        while True:    
-            x = np.random.randint(0,self.env.getLines())
-            y = np.random.randint(0,self.env.getColumns())
-            if(self.env.game.grid[x,y] == 0):
-                return (x,y)
 
     def reset(self):
         self.env.reset()
         self.env.seed(1)
-        # self.env.game.player = self.randomStart() # uses randomStart
         self.state = self.env.getPlayer()
         self.state_actions = []
 
@@ -144,7 +135,7 @@ if __name__ == "__main__":
     cumulative_r_100 = agent.cumulative_reward_per_episode
 
     # Save the Q-table in a text file
-    with open(r'training_testDQB.txt','w+') as f:
+    with open(r'training_test.txt','w+') as f:
         f.write(str(agent.Q_values))
 
     noEpoches = agent.max_epochs
@@ -172,4 +163,3 @@ if __name__ == "__main__":
     print(f"Convergence speed After {conv} episodes")
     
     plt.show()
-    
