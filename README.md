@@ -11,7 +11,15 @@ This project is a pathfinding simulation, where the seeker is not provided a map
 
 Setup:
 To run this project, you may first have to download some dependencies. There is a setup script inside the "Python Codes" folder, which when run should install all if not nearly everything you need for running. Additionally, running any of the scripts will tell you what you are missing as an error, but here is a list:
-Python
+gym==0.9.7
+keras==2.14.0
+matplotlib==3.8.4
+numpy==1.26.4
+pygame==2.5.2
+pytest==8.2.0
+scipy==1.13.0
+setuptools==59.6.0
+tensorflow==2.14.0
 
 Instructions to run each algorithm:
 Open up the "Python Codes" folder in the Terminal. From here, you can run each of the following scripts with python ______.py where the blank space is name of the script. This is a list of the scripts relevant to our project and presentation:
