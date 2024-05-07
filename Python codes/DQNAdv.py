@@ -168,7 +168,10 @@ if __name__ == "__main__":
         # above, option to write to disk periodically
         steps_per_episode.append(steps)
         cumulative_reward_per_episode.append(reward_sum)
-    
+
+    # Calculate average cumulative rewards
+    average_cumulative_rewards = np.mean(cumulative_reward_per_episode)
+
     plt.figure(1)
     plt.plot(range(EPISODES), steps_per_episode)
     plt.xlabel("Episodes")
@@ -179,5 +182,7 @@ if __name__ == "__main__":
     plt.plot(range(EPISODES), cumulative_reward_per_episode)
     plt.xlabel("Episodes")
     plt.ylabel("Cumulative reward")
+    # Printing the average cumulative rewards
+    print("Average Cumulative Reward:", average_cumulative_rewards)
 
     plt.show()
